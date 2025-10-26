@@ -163,7 +163,7 @@ export default function VideoUrlUploadPage() {
                   )}
                 </div>
               ) : (
-                <p className="text-gray-400">No status fetched yet. Upload a video and click "Check Status".</p>
+                <p className="text-gray-400">No status fetched yet. Upload a video and click Check Status.</p>
               )}
             </CardContent>
           </Card>
