@@ -36,6 +36,34 @@ export const uploadTikTokVideo = async (
 }
 
 /**
+ * Upload a TikTok video by providing a public video URL
+ * Endpoint: POST /tiktok/post/upload-url (application/x-www-form-urlencoded)
+ */
+export const uploadTikTokVideoByUrl = async (
+  videoUrl: string,
+  title: string,
+  token: string
+): Promise<TikTokUploadResponse> => {
+  if (!token) {
+    throw new Error('Missing auth token')
+  }
+
+  const body = new URLSearchParams()
+  body.set('title', title)
+  body.set('video_url', videoUrl)
+
+  const res = await api.post<TikTokUploadResponse>('/tiktok/post/upload-url', body, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+      accept: 'application/json',
+    },
+  })
+
+  return res.data
+}
+
+/**
  * Check processing/publish status of an uploaded video.
  * Accepts either an absolute or base-relative path returned by backend (e.g., "/tiktok/post/status/<publish_id>").
  */

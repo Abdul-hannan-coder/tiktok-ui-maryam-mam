@@ -301,3 +301,15 @@ Your TikTok integration is now production-ready with:
 - ✅ Clean architecture
 
 All APIs and hooks are ready to use! Just add your TikTok credentials and you're good to go.
+
+## UI: TikTok Upload by URL
+
+- Endpoint used: `POST /tiktok/post/upload-url` (application/x-www-form-urlencoded)
+- Client helper: `uploadTikTokVideoByUrl(videoUrl, title, token)` in `src/lib/upload/uploadApi.ts`
+- Hook method: `uploadVideoByUrl(videoUrl, title)` in `src/lib/upload/useTikTokUpload.ts`
+- New page: `src/app/dashboard/upload/video-url/page.tsx`
+  - Fields: Title, Video URL
+  - Actions: Upload via URL, Reset, and Check Status (uses `status_check_url`)
+  - Displays: `publish_id`, `upload_status`, `file_info.filename`, and latest status
+
+- Upload hub updated: `src/app/dashboard/upload/page.tsx` now links to “Upload by URL” alongside existing tiles.

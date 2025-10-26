@@ -3,7 +3,7 @@
 import { useCallback, useReducer, useRef } from 'react'
 import { STORAGE_KEYS } from '@/lib/auth/authConstants'
 import { uploadReducer, initialUploadState } from './Reducers/uploadReducer'
-import { uploadTikTokVideo, checkTikTokUploadStatus } from './uploadApi'
+import { uploadTikTokVideo, uploadTikTokVideoByUrl, checkTikTokUploadStatus } from './uploadApi'
 import {
   TikTokUploadResponse,
   TikTokUploadStatusResponse,
@@ -67,6 +67,24 @@ const useTikTokUpload = () => {
     []
   )
 
+  const uploadVideoByUrl = useCallback(
+    async (videoUrl: string, title: string): Promise<TikTokUploadResponse | null> => {
+      dispatch({ type: 'START_UPLOAD' })
+      try {
+        const token = getToken()
+        if (!token) throw new Error('You must be logged in to upload')
+        const result = await uploadTikTokVideoByUrl(videoUrl, title, token)
+        dispatch({ type: 'UPLOAD_SUCCESS', payload: { data: result.data, message: result.message } })
+        return result
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Upload failed'
+        dispatch({ type: 'UPLOAD_ERROR', payload: message })
+        return null
+      }
+    },
+    []
+  )
+
   const reset = useCallback(() => {
     dispatch({ type: 'RESET' })
     lastProgress.current = null
@@ -83,6 +101,7 @@ const useTikTokUpload = () => {
 
     // actions
     uploadVideo,
+    uploadVideoByUrl,
     checkStatus,
     reset,
   }

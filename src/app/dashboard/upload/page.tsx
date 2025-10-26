@@ -27,7 +27,7 @@ export default function UploadPage() {
         </div>
 
         {/* Upload Options */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Image + Text Post */}
           <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-2 bg-[#1A103D]/50 backdrop-blur-sm border-0 shadow-xl shadow-[#6C63FF]/30">
             <CardHeader className="text-center pb-4">
@@ -98,6 +98,40 @@ export default function UploadPage() {
               >
                 <Link href="/dashboard/upload/video-text">
                   Create Video Post
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Video URL Upload */}
+          <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-2 bg-[#1A103D]/50 backdrop-blur-sm border-0 shadow-xl shadow-[#6C63FF]/30">
+            <CardHeader className="text-center pb-4">
+              <div className="w-20 h-20 bg-linear-to-r from-[#22c55e] to-[#16a34a] rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:from-[#16a34a] group-hover:to-[#15803d] transition-colors">
+                <UploadIcon className="h-10 w-10 text-white" />
+              </div>
+              <CardTitle className="text-2xl text-white mb-2">Upload by URL</CardTitle>
+              <p className="text-[#C5C5D2]">
+                Paste a public video URL and title; we’ll import it and send to TikTok via your backend.
+              </p>
+            </CardHeader>
+            <CardContent className="text-center">
+              <div className="space-y-4 mb-6">
+                <div className="flex items-center justify-center space-x-2 text-[#C5C5D2]">
+                  <UploadIcon className="h-4 w-4" />
+                  <span className="text-sm">Supports application/x-www-form-urlencoded</span>
+                </div>
+                <div className="flex items-center justify-center space-x-2 text-[#C5C5D2]">
+                  <FileText className="h-4 w-4" />
+                  <span className="text-sm">Provide Title and Video URL</span>
+                </div>
+              </div>
+              <Button 
+                asChild
+                className="w-full bg-linear-to-r from-[#22c55e] to-[#16a34a] hover:from-[#16a34a] hover:to-[#15803d] text-white font-semibold py-3 rounded-2xl transition-all duration-300 shadow-lg shadow-[#22c55e]/30"
+              >
+                <Link href="/dashboard/upload/video-url">
+                  Upload via URL
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
