@@ -1,13 +1,13 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { exchangeTikTokCode, getTikTokUserInfo } from '@/lib/auth/tiktokApi'
 import { STORAGE_KEYS } from '@/lib/auth/authConstants'
 import { storeTikTokConnection } from '@/lib/auth/authFlow'
 import { Loader2, CheckCircle, XCircle } from 'lucide-react'
 
-export default function TikTokCallbackPage() {
+function TikTokCallbackContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
@@ -143,5 +143,25 @@ export default function TikTokCallbackPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function TikTokCallbackPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gradient-to-br from-[#0A012A] via-[#1A103D] to-[#0A012A] flex items-center justify-center p-4">
+          <div className="max-w-md w-full bg-white/5 backdrop-blur-lg rounded-2xl p-8 border border-white/10">
+            <div className="text-center space-y-6">
+              <Loader2 className="animate-spin w-16 h-16 mx-auto text-[#6C63FF]" />
+              <h2 className="text-2xl font-bold text-white">Processing...</h2>
+              <p className="text-[#C5C5D2]">Please wait while we connect your TikTok account.</p>
+            </div>
+          </div>
+        </div>
+      }
+    >
+      <TikTokCallbackContent />
+    </Suspense>
   )
 }
