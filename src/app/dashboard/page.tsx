@@ -1,5 +1,6 @@
 "use client"
 
+import { TikTokAuthGuard } from "@/components/TikTokAuthGuard"
 import { DashboardLayout } from "@/components/DashboardLayout"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -12,7 +13,7 @@ import {
   Eye
 } from "lucide-react"
 
-export default function DashboardPage() {
+function DashboardPage() {
   // Dummy data from the user
   const userProfile = {
     id: "1932850183718477824",
@@ -205,3 +206,14 @@ export default function DashboardPage() {
     </DashboardLayout>
   )
 }
+
+// Wrap the component export with TikTokAuthGuard
+function DashboardPageWithGuard() {
+  return (
+    <TikTokAuthGuard>
+      <DashboardPage />
+    </TikTokAuthGuard>
+  )
+}
+
+export default DashboardPageWithGuard

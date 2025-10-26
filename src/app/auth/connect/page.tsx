@@ -4,15 +4,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Header } from "@/components/Home-Content/Header";
 import { Footer } from "@/components/Home-Content/Footer";
-import { ExternalLink, Loader2 } from "lucide-react";
+import { ExternalLink, Loader2, CheckCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
+import { generateTikTokAuthUrl } from "@/lib/auth/tiktokApi";
+import { STORAGE_KEYS } from "@/lib/auth/authConstants";
+import { checkTikTokConnectionStatus } from "@/lib/auth/authFlow";
 
 export default function ConnectPage() {
   const [isConnecting, setIsConnecting] = useState(false);
   const router = useRouter();
   const { isAuthenticated, isLoading } = useAuth();
+  const [alreadyConnected, setAlreadyConnected] = useState(false);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -21,11 +25,34 @@ export default function ConnectPage() {
     }
   }, [isAuthenticated, isLoading, router]);
 
+  // Check if already connected
+  useEffect(() => {
+    const { isConnected } = checkTikTokConnectionStatus();
+    if (isConnected) {
+      setAlreadyConnected(true);
+    }
+  }, []);
+
   const handleConnectTikTok = () => {
     setIsConnecting(true);
-    setTimeout(() => {
-      router.push("/dashboard");
-    }, 3000);
+    
+    try {
+      // Generate TikTok OAuth URL
+      const { authUrl, state } = generateTikTokAuthUrl();
+      
+      // Store state for CSRF verification
+      localStorage.setItem(STORAGE_KEYS.TIKTOK_AUTH_STATE, state);
+      
+      // Redirect to TikTok OAuth
+      window.location.href = authUrl;
+    } catch (error) {
+      console.error('Error generating TikTok auth URL:', error);
+      setIsConnecting(false);
+    }
+  };
+
+  const handleGoToDashboard = () => {
+    router.push("/dashboard");
   };
 
   // Show loading while checking authentication
@@ -73,44 +100,67 @@ export default function ConnectPage() {
 
                 {/* Title */}
                 <h1 className="text-3xl font-bold text-white mb-8">
-                  Connect Your TikTok Channel
+                  {alreadyConnected ? "TikTok Already Connected!" : "Connect Your TikTok Channel"}
                 </h1>
 
-                {/* Connect Button */}
-                <Button
-                  onClick={handleConnectTikTok}
-                  disabled={isConnecting}
-                  className="w-full bg-gradient-to-r from-[#6C63FF] to-[#FF2E97] hover:from-[#5A52E6] hover:to-[#E61E87] text-white font-semibold py-4 rounded-2xl transition-all duration-300 mb-8"
-                >
-                  {isConnecting ? (
-                    <>
-                      <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                      Connecting...
-                    </>
-                  ) : (
-                    <>
-                      <ExternalLink className="h-5 w-5 mr-2" />
-                      Connect with TikTok
-                    </>
-                  )}
-                </Button>
+                {alreadyConnected ? (
+                  <>
+                    {/* Success Icon */}
+                    <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <CheckCircle className="w-12 h-12 text-green-500" />
+                    </div>
+                    
+                    {/* Go to Dashboard Button */}
+                    <Button
+                      onClick={handleGoToDashboard}
+                      className="w-full bg-gradient-to-r from-[#6C63FF] to-[#FF2E97] hover:from-[#5A52E6] hover:to-[#E61E87] text-white font-semibold py-4 rounded-2xl transition-all duration-300 mb-4"
+                    >
+                      Go to Dashboard
+                    </Button>
 
-                {/* Loading Bar */}
-                {isConnecting && (
-                  <div className="w-full bg-[#2A1A4D] rounded-full h-2 mb-4">
-                    <div
-                      className="bg-gradient-to-r from-[#6C63FF] to-[#FF2E97] h-2 rounded-full animate-pulse"
-                      style={{ width: "100%" }}
-                    ></div>
-                  </div>
+                    <p className="text-[#C5C5D2] text-sm">
+                      Your TikTok account is already connected. Head to the dashboard to manage your content.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    {/* Connect Button */}
+                    <Button
+                      onClick={handleConnectTikTok}
+                      disabled={isConnecting}
+                      className="w-full bg-gradient-to-r from-[#6C63FF] to-[#FF2E97] hover:from-[#5A52E6] hover:to-[#E61E87] text-white font-semibold py-4 rounded-2xl transition-all duration-300 mb-8"
+                    >
+                      {isConnecting ? (
+                        <>
+                          <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                          Connecting...
+                        </>
+                      ) : (
+                        <>
+                          <ExternalLink className="h-5 w-5 mr-2" />
+                          Connect with TikTok
+                        </>
+                      )}
+                    </Button>
+
+                    {/* Loading Bar */}
+                    {isConnecting && (
+                      <div className="w-full bg-[#2A1A4D] rounded-full h-2 mb-4">
+                        <div
+                          className="bg-gradient-to-r from-[#6C63FF] to-[#FF2E97] h-2 rounded-full animate-pulse"
+                          style={{ width: "100%" }}
+                        ></div>
+                      </div>
+                    )}
+
+                    {/* Info Text */}
+                    <p className="text-[#C5C5D2] text-sm">
+                      {isConnecting
+                        ? "Redirecting to TikTok authorization..."
+                        : "Connect your TikTok account to start automating your posts"}
+                    </p>
+                  </>
                 )}
-
-                {/* Info Text */}
-                <p className="text-[#C5C5D2] text-sm">
-                  {isConnecting
-                    ? "Please wait while we connect your TikTok account..."
-                    : "Connect your TikTok account to start automating your posts"}
-                </p>
               </CardContent>
             </Card>
           </div>

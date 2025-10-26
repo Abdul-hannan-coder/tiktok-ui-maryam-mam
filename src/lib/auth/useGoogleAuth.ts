@@ -56,12 +56,12 @@ const useGoogleAuth = () => {
         throw new Error('Google OAuth is not configured');
       }
 
-      // Redirect to Google OAuth login URL
-      const loginUrl = `https://backend.postsiva.com${status.login_url}`;
+      // Create the OAuth URL with YOUR redirect URI (not backend's)
+      const redirectUri = encodeURIComponent(`${window.location.origin}/auth/google/callback`);
+      const loginUrl = `https://backend.postsiva.com/auth/google/login?redirect_uri=${redirectUri}`;
       
-      // Store the current URL to redirect back after login
-  const currentUrl = window.location.href;
-  localStorage.setItem(STORAGE_KEYS.GOOGLE_AUTH_REDIRECT, currentUrl);
+      // Store the intended destination after auth
+      localStorage.setItem(STORAGE_KEYS.GOOGLE_AUTH_REDIRECT, '/auth/connect'); // Will be checked for TikTok after
       
       console.log('Redirecting to Google OAuth:', loginUrl);
       
@@ -145,14 +145,14 @@ const useGoogleAuth = () => {
         
         console.log('✅ Google authentication successful with session tracking')
 
-        // Get the redirect URL from localStorage
-  const redirectUrl = localStorage.getItem(STORAGE_KEYS.GOOGLE_AUTH_REDIRECT);
-  localStorage.removeItem(STORAGE_KEYS.GOOGLE_AUTH_REDIRECT);
+        // Get the redirect URL from localStorage or use smart redirect
+        localStorage.removeItem(STORAGE_KEYS.GOOGLE_AUTH_REDIRECT);
 
-        // Redirect to the original URL or dashboard
-        const targetUrl = redirectUrl && redirectUrl !== window.location.href 
-          ? redirectUrl 
-          : '/dashboard';
+        // Import and use the auth flow utility
+        const { getPostLoginRedirectPath } = await import('./authFlow');
+        const targetUrl = getPostLoginRedirectPath(); // Will check TikTok connection
+        
+        console.log('🔀 Smart redirect after Google login:', targetUrl);
         
         // Quietly fetch and cache Gemini API key (non-blocking, ignore errors)
         try {

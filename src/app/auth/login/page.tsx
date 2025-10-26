@@ -11,10 +11,12 @@ import { Mail, Lock, Eye, EyeOff, CheckCircle, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth, useGoogleAuth } from "@/lib/auth";
+import { getPostLoginRedirectPath } from "@/lib/auth/authFlow";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [redirectMessage, setRedirectMessage] = useState("Checking TikTok connection...");
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     email: "",
@@ -39,9 +41,20 @@ export default function LoginPage() {
 
     try {
       await login(formData);
+      
+      // Check TikTok connection status and get appropriate redirect path
+      const redirectPath = getPostLoginRedirectPath();
+      
+      // Set appropriate message based on redirect path
+      if (redirectPath === '/dashboard') {
+        setRedirectMessage("TikTok connected! Redirecting to dashboard...");
+      } else {
+        setRedirectMessage("Redirecting to connect TikTok...");
+      }
+      
       setShowSuccessPopup(true);
       setTimeout(() => {
-        router.push("/auth/connect");
+        router.push(redirectPath);
       }, 2000);
     } catch (err: unknown) {
       const errorMessage =
@@ -77,7 +90,7 @@ export default function LoginPage() {
               Login Successful!
             </h3>
             <p className="text-[#C5C5D2] mb-4">
-              Redirecting to TikTok connection...
+              {redirectMessage}
             </p>
             <div className="w-full bg-[#2A1A4D] rounded-full h-2">
               <div
