@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+/* Global CSS for TikTok-style Dark Theme */
+
+:root {
+  /* TikTok Primary Colors */
+  --tiktok-primary-start: #6C63FF;
+  --tiktok-primary-end: #FF2E97;
+  --tiktok-secondary: #00F5FF;
+  --tiktok-highlight: #FF007F;
+  
+  /* Background Colors */
+  --bg-primary: #0A012A;
+  --bg-secondary: #1A103D;
+  --bg-tertiary: #2A1A4D;
+  --bg-hover: #1A103D;
+  
+  /* Text Colors */
+  --text-primary: #FFFFFF;
+  --text-secondary: #C5C5D2;
+  --text-link: #6C63FF;
+  
+  /* Border Colors */
+  --border-primary: #2A1A4D;
+  --border-secondary: #3A2A5D;
+  
+  /* Button Colors */
+  --btn-primary-bg: linear-gradient(135deg, #6C63FF 0%, #FF2E97 100%);
+  --btn-primary-hover: linear-gradient(135deg, #5A52E6 0%, #E61E87 100%);
+  --btn-secondary-bg: transparent;
+  --btn-secondary-border: #3A2A5D;
+  
+  /* Sidebar */
+  --sidebar-bg: #0A012A;
+  --sidebar-hover: #1A103D;
+  
+  /* Accent Colors */
+  --accent-red: #FF2E97;
+  --accent-green: #00F5FF;
+  --accent-yellow: #FFD700;
+
+  /* Legacy variables for compatibility */
+  --background: var(--bg-primary);
+  --foreground: var(--text-primary);
+}
+
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+}
