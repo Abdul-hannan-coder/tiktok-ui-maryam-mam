@@ -8,6 +8,30 @@ import {
   TikTokApiResponse,
 } from './types/tiktokTypes'
 
+// Backend token shape for GET /tiktok/get-token
+export interface TikTokBackendToken {
+  access_token: string
+  token_type?: string
+  user_id?: string
+  scope?: string
+  tiktok_user_id?: string | null
+  refresh_expires_in?: number
+  created_at?: string
+  refresh_token?: string
+  id?: number
+  expires_in?: number
+  expires_at?: string
+  open_id?: string
+  test_user_id?: string | null
+  updated_at?: string
+}
+
+export interface TikTokGetTokenResponse {
+  success: boolean
+  message: string
+  data: TikTokBackendToken | null
+}
+
 /**
  * Check if the user has a valid TikTok connection
  * @param token - The access token to validate
@@ -53,6 +77,22 @@ export const checkTikTokConnection = async (
       },
     }
   }
+}
+
+/**
+ * Fetch TikTok token from backend to determine if user already connected.
+ * Uses app auth token (Bearer) and returns backend-stored TikTok token info if available.
+ */
+export const getTikTokTokenFromBackend = async (
+  authToken: string
+): Promise<TikTokGetTokenResponse> => {
+  const res = await api.get<TikTokGetTokenResponse>('/tiktok/get-token', {
+    headers: {
+      Authorization: `Bearer ${authToken}`,
+      accept: 'application/json',
+    },
+  })
+  return res.data
 }
 
 /**

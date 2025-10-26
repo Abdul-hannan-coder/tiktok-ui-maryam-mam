@@ -8,9 +8,9 @@ import { ExternalLink, Loader2, CheckCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
-import { generateTikTokAuthUrl } from "@/lib/auth/tiktokApi";
+import { generateTikTokAuthUrl, getTikTokTokenFromBackend } from "@/lib/auth/tiktokApi";
 import { STORAGE_KEYS } from "@/lib/auth/authConstants";
-import { checkTikTokConnectionStatus } from "@/lib/auth/authFlow";
+import { checkTikTokConnectionStatus, storeTikTokConnection } from "@/lib/auth/authFlow";
 
 export default function ConnectPage() {
   const [isConnecting, setIsConnecting] = useState(false);
@@ -27,10 +27,46 @@ export default function ConnectPage() {
 
   // Check if already connected
   useEffect(() => {
+    // First, do a quick local check (cached tokens)
     const { isConnected } = checkTikTokConnectionStatus();
     if (isConnected) {
       setAlreadyConnected(true);
+      return;
     }
+
+    // Then, confirm via backend: GET /tiktok/get-token
+    const run = async () => {
+      try {
+        const appToken = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
+        if (!appToken) return;
+
+        const res = await getTikTokTokenFromBackend(appToken);
+        if (res?.success && res.data?.access_token) {
+          // Store tokens locally to unify connection checks across the app
+          const expiresIn = typeof res.data.expires_in === 'number'
+            ? res.data.expires_in
+            : // fallback if only expires_at exists
+              (res.data.expires_at ? Math.max(0, Math.floor((new Date(res.data.expires_at).getTime() - Date.now()) / 1000)) : 0);
+
+          storeTikTokConnection({
+            accessToken: res.data.access_token,
+            refreshToken: res.data.refresh_token ?? undefined,
+            expiresIn,
+            userInfo: {
+              open_id: res.data.open_id,
+              scope: res.data.scope,
+            },
+          });
+
+          setAlreadyConnected(true);
+        }
+      } catch (err) {
+        // Silent fail; keep showing connect UI
+        console.warn('TikTok backend token check failed:', err);
+      }
+    };
+
+    run();
   }, []);
 
   const handleConnectTikTok = () => {
